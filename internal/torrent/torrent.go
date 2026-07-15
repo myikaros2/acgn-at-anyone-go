@@ -43,7 +43,6 @@ func NewClient(config *config.TorrentConfig) *Client {
 			URLs: config.ICEServers,
 		},
 	}
-	cfg.DisableUTP = true
 	cfg.Seed = true
 
 	client, err := torrent.NewClient(cfg)
@@ -68,10 +67,6 @@ func NewClient(config *config.TorrentConfig) *Client {
 		StatsRecorder: counter,
 		OnDeletion: func(e otter.DeletionEvent[string, *Torrent]) {
 			t := e.Value
-			log.Printf(
-				"deletionEvent remove torrent: %s\nCause:%s\n",
-				t.torrent.InfoHash().HexString(),
-				e.Cause)
 			cl.RemoveTorrentAndFiles(t)
 		},
 	})
@@ -126,27 +121,6 @@ func (cl *Client) DownloadAndCache(t *Torrent) {
 			return
 		}
 		t.torrent.DownloadAll()
-		go func() {
-			start := time.Now()
-			ticker := time.NewTicker(2 * time.Second)
-			defer ticker.Stop()
-			for {
-				select {
-				case <-t.torrent.Closed():
-					return
-
-				case <-ticker.C:
-					completed := t.torrent.BytesCompleted()
-					length := t.torrent.Length()
-					infoHash := t.torrent.InfoHash().HexString()
-					if length > 0 && completed >= length {
-						log.Printf("download completed: %s, times: %s", infoHash, time.Since(start))
-						return
-					}
-					log.Printf("%s: download: %d, length: %d, peers: %d", infoHash, completed, length, t.torrent.Stats().ActivePeers)
-				}
-			}
-		}()
 		cl.AddCache(t)
 
 	case <-timer.C:
@@ -155,12 +129,10 @@ func (cl *Client) DownloadAndCache(t *Torrent) {
 }
 
 func (cl *Client) AddCache(t *Torrent) {
-	log.Printf("add cache: %s", t.torrent.InfoHash().HexString())
 	cl.cache.Set(t.torrent.InfoHash().HexString(), t)
 }
 
 func (cl *Client) RefreshCache(t *torrent.Torrent) {
-	log.Printf("refresh cache: %s", t.InfoHash().HexString())
 	cl.cache.GetIfPresent(t.InfoHash().HexString())
 }
 
@@ -185,14 +157,12 @@ func (cl *Client) RemoveTorrentAndFiles(t *Torrent) {
 		if err != nil {
 			log.Printf("failed close storage: %v", err)
 		}
-		log.Println("closed storage: ", infoHash)
 	}
 	err := os.RemoveAll(filepath.Join(cl.config.DataDir, infoHash))
 	if err != nil {
 		log.Printf("failed remove torrent dir: %v", err)
 		return
 	}
-	log.Printf("remove torrent dir: %s", infoHash)
 }
 
 func (cl *Client) cleanup() {
@@ -203,7 +173,6 @@ func (cl *Client) cleanup() {
 			cl.RemoveTorrentAndFiles(&Torrent{
 				torrent: t,
 			})
-			log.Println("cleanup torrent: ", t.InfoHash().HexString())
 		}
 	}
 
@@ -220,7 +189,6 @@ func (cl *Client) cleanup() {
 				log.Printf("failed cleanup torrent dir: %v", err)
 				return
 			}
-			log.Printf("cleanup torrent dir: %s", infoHash)
 		}
 	}
 }
@@ -230,7 +198,6 @@ func (cl *Client) cleanupTimer(interval time.Duration) {
 	go func() {
 		for range timer.C {
 			cl.cleanup()
-			log.Println("cleanup")
 		}
 	}()
 }

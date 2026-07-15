@@ -43,7 +43,7 @@ func LoadConfig(path string) (*Config, error) {
 	var config Config
 	err = yaml.NewDecoder(file).Decode(&config)
 	if err != nil {
-		log.Printf("failed to open config file: %v", err)
+		log.Printf("failed to read config file: %v", err)
 		return nil, nil
 	}
 

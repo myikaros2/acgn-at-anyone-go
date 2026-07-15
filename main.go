@@ -6,6 +6,7 @@ import (
 	"acgn-at-anyone-go/internal/torrent"
 	"context"
 	"errors"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -18,8 +19,10 @@ import (
 )
 
 func main() {
+	configPath := flag.String("config", "config.yaml", "config path")
+	flag.Parse()
 
-	cfg, err := config.LoadConfig("config/config.yaml")
+	cfg, err := config.LoadConfig(*configPath)
 	if err != nil || cfg == nil {
 		panic(err)
 	}
@@ -30,6 +33,7 @@ func main() {
 	torrentHandler := torrent.NewHandler(torrentClient)
 	healthHandler := health.NewHandler(healthClient)
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
 	r.POST("/seed", torrentHandler.AddMagnet)
@@ -42,8 +46,9 @@ func main() {
 	}
 
 	go func() {
+		log.Println("Server running at:", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("listen failed: %s\n", err)
+			log.Fatalln("Server listen failed:", err)
 		}
 	}()
 
@@ -56,7 +61,7 @@ func main() {
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown Error:", err)
+		log.Fatalln("Server Shutdown Error:", err)
 	}
 
 	log.Println("Server exited")
