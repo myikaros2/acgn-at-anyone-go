@@ -4,10 +4,10 @@ go 1.26.4
 
 require (
 	github.com/anacrolix/torrent v1.61.0
-	github.com/dgraph-io/ristretto/v2 v2.4.1
 	github.com/gin-gonic/gin v1.12.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/maypok86/otter/v2 v2.3.0
+	github.com/pion/webrtc/v4 v4.0.0
 )
 
 require (
@@ -37,7 +37,6 @@ require (
 	github.com/bytedance/sonic v1.15.0 // indirect
 	github.com/bytedance/sonic/loader v0.5.0 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -84,7 +83,6 @@ require (
 	github.com/pion/stun/v3 v3.0.0 // indirect
 	github.com/pion/transport/v3 v3.0.7 // indirect
 	github.com/pion/turn/v4 v4.0.0 // indirect
-	github.com/pion/webrtc/v4 v4.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/protolambda/ctxlock v0.1.0 // indirect
