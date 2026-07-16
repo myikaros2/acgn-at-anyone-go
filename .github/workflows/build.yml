@@ -23,16 +23,16 @@ jobs:
       # 交叉编译为 Linux 64位 二进制文件
       - name: Build Go Application
         run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o acgn-at-anyone main.go
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ${{ github.event.repository.name }} main.go
 
       # 打包二进制程序与配置文件
       - name: Compress App binaries
         run: |
           # 压缩二进制和配置为 zip
-          zip acgn-at-anyone.zip acgn-at-anyone config.yaml
+          zip ${{ github.event.repository.name }}.zip ${{ github.event.repository.name }} config.yaml
           
           # 压缩二进制和配置为 tar.gz
-          tar -czf acgn-at-anyone.tar.gz acgn-at-anyone config.yaml
+          tar -czf ${{ github.event.repository.name }}.tar.gz ${{ github.event.repository.name }} config.yaml
 
       # 使用 git archive 干净地打包项目源码（同时生成 zip 和 tar.gz）
       - name: Compress Source Code
@@ -52,6 +52,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           # 传输生成的 4 个压缩包文件
-          source: "acgn-at-anyone.zip,acgn-at-anyone.tar.gz,source_code.zip,source_code.tar.gz"
-          target: ${{ secrets.SERVER_DIR }}           # 更改为你服务器上用来存放压缩包的【目标目录】
+          source: "${{ github.event.repository.name }}.zip,${{ github.event.repository.name }}.tar.gz,source_code.zip,source_code.tar.gz"
+          target: "${{ secrets.SERVER_DIR }}/${{ github.event.repository.name }}"           # 更改为你服务器上用来存放压缩包的【目标目录】
           overwrite: true                  # 允许覆盖同名旧文件
