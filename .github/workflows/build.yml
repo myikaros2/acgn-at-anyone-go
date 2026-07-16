@@ -5,6 +5,9 @@ on:
     branches:
       - main  # 当 push 代码到 main 分支时触发
 
+permissions:
+  contents: read
+
 jobs:
   archive:
     runs-on: ubuntu-latest # 在 GitHub 的 Ubuntu 虚拟机上运行
