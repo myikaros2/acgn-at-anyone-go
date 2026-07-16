@@ -2,6 +2,7 @@ client:
   name: "acgn@anyone"
   port: 9090 # 客户端运行端口
 
+# acgndiy服务器相关配置，你可以删除或配置自己的独立实现
 health:
   host: "https://api.acgndiy.com/"
 
@@ -9,10 +10,14 @@ torrent:
   path: "/var/tmp/torrents/" # torrent保存路径
   max_disk_usage: 20 # 磁盘使用量限制 (GiB)
   clean_interval: 30m # 清理间隔
+  # 自定义 trackers
   trackers:
     - "wss://tracker.ycyworld.com"
     - "wss://tracker.openwebtorrent.com"
     - "udp://tracker.opentrackr.org:1337/announce"
+    # - 添加你自己的 tracker
+  # 自定义 ICEServers
   ice_servers:
     - "stun:stun.ycyworld.com:3478"
     - "stun:stun.l.google.com:19302"
+    # - 添加你自己的 ICEServer

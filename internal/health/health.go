@@ -5,6 +5,7 @@ import (
 	"acgn-at-anyone-go/internal/torrent"
 	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 )
@@ -31,6 +32,10 @@ func NewHealth(config *config.Config, torrentClient *torrent.Client) *Health {
 }
 
 func (h *Health) HeartbeatTicker() {
+	if h.config.Health.Host == "" {
+		log.Println("Health port not set, skip health check")
+		return
+	}
 	ticker := time.NewTicker(time.Minute)
 	go func() {
 		for range ticker.C {
